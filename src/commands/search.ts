@@ -30,7 +30,7 @@ export function setupSearchCommand(): Command {
     .action(
       wrapCommand(async (options: SearchOptions) => {
         const profile = parseProfile(options.profile);
-        const client = await createSlackClient(profile);
+        const client = await createSlackClient(profile, 'user');
 
         const count = parseCount(
           options.number,

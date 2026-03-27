@@ -49,8 +49,39 @@ export function setupReactionCommand(): Command {
       })
     );
 
+  const listCommand = new Command('list')
+    .description('List reactions on a message')
+    .requiredOption('-c, --channel <channel>', 'Channel name or ID')
+    .requiredOption('-t, --timestamp <timestamp>', 'Message timestamp')
+    .option('--format <format>', 'Output format: simple, json', 'simple')
+    .option('--profile <profile>', 'Use specific workspace profile')
+    .hook('preAction', createValidationHook([optionValidators.reactionTimestamp]))
+    .action(
+      wrapCommand(async (options: ReactionOptions & { format?: string }) => {
+        const profile = parseProfile(options.profile);
+        const client = await createSlackClient(profile);
+        const reactions = await client.listReactions(options.channel, options.timestamp);
+
+        if (options.format === 'json') {
+          console.log(JSON.stringify(reactions, null, 2));
+          return;
+        }
+
+        if (reactions.length === 0) {
+          console.log(chalk.gray('No reactions on this message'));
+          return;
+        }
+
+        console.log(chalk.bold('Reactions:'));
+        for (const r of reactions) {
+          console.log(`  :${r.name}: × ${r.count} (${r.users.length} users)`);
+        }
+      })
+    );
+
   reactionCommand.addCommand(addCommand);
   reactionCommand.addCommand(removeCommand);
+  reactionCommand.addCommand(listCommand);
 
   return reactionCommand;
 }

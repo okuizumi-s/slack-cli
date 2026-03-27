@@ -30,4 +30,15 @@ export class ReactionOperations extends BaseSlackClient {
       name: this.stripColons(emoji),
     });
   }
+
+  async listReactions(channel: string, timestamp: string): Promise<Array<{ name: string; count: number; users: string[] }>> {
+    const channelId = await this.channelOps.resolveChannelId(channel);
+    const response = await this.client.reactions.get({
+      channel: channelId,
+      timestamp,
+      full: true,
+    });
+    const message = (response as { message?: { reactions?: Array<{ name: string; count: number; users: string[] }> } }).message;
+    return message?.reactions || [];
+  }
 }

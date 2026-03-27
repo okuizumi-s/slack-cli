@@ -7,8 +7,13 @@ import { setupCanvasCommand } from './commands/canvas';
 import { setupChannelCommand } from './commands/channel';
 import { setupChannelsCommand } from './commands/channels';
 import { setupConfigCommand } from './commands/config';
+import { setupCallsCommand } from './commands/calls';
 import { setupDeleteCommand } from './commands/delete';
+import { setupDndCommand } from './commands/dnd';
+import { setupEmojiCommand } from './commands/emoji';
 import { setupEditCommand } from './commands/edit';
+import { setupFilesCommand } from './commands/files';
+import { setupListsCommand } from './commands/lists';
 import { setupHistoryCommand } from './commands/history';
 import { setupInviteCommand } from './commands/invite';
 import { setupJoinCommand } from './commands/join';
@@ -17,12 +22,17 @@ import { setupMembersCommand } from './commands/members';
 import { setupPinCommand } from './commands/pin';
 import { setupReactionCommand } from './commands/reaction';
 import { setupReminderCommand } from './commands/reminder';
+import { setupRemoteFilesCommand } from './commands/remote-files';
 import { setupScheduledCommand } from './commands/scheduled';
 import { setupSearchCommand } from './commands/search';
+import { setupSearchFilesCommand } from './commands/search-files';
+import { setupSearchUsersCommand } from './commands/search-users';
 import { setupSendCommand } from './commands/send';
 import { setupSendEphemeralCommand } from './commands/send-ephemeral';
+import { setupStatusCommand } from './commands/status';
 import { setupUnreadCommand } from './commands/unread';
 import { setupUploadCommand } from './commands/upload';
+import { setupUsergroupCommand } from './commands/usergroup';
 import { setupUsersCommand } from './commands/users';
 import { checkForUpdates } from './utils/update-notifier';
 
@@ -68,6 +78,16 @@ export function createProgram(): Command {
   program.addCommand(setupReminderCommand());
   program.addCommand(setupBookmarkCommand());
   program.addCommand(setupCanvasCommand());
+  program.addCommand(setupFilesCommand());
+  program.addCommand(setupDndCommand());
+  program.addCommand(setupEmojiCommand());
+  program.addCommand(setupUsergroupCommand());
+  program.addCommand(setupStatusCommand());
+  program.addCommand(setupCallsCommand());
+  program.addCommand(setupListsCommand());
+  program.addCommand(setupRemoteFilesCommand());
+  program.addCommand(setupSearchFilesCommand());
+  program.addCommand(setupSearchUsersCommand());
 
   return program;
 }

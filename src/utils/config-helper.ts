@@ -1,3 +1,4 @@
+import type { Config, TokenType } from '../types/config';
 import { ERROR_MESSAGES } from './constants';
 import { ConfigurationError } from './errors';
 import { ProfileConfigManager } from './profile-config';
@@ -8,7 +9,7 @@ import { ProfileConfigManager } from './profile-config';
 export async function getConfigOrThrow(
   profile?: string,
   configManager: ProfileConfigManager = new ProfileConfigManager()
-): Promise<{ token: string }> {
+): Promise<Config> {
   const config = await configManager.getConfig(profile);
 
   if (!config) {
@@ -18,4 +19,34 @@ export async function getConfigOrThrow(
   }
 
   return config;
+}
+
+/**
+ * Resolve which token to use based on tokenType and --as-bot flag.
+ * Default: user token. Fallback to legacy `token` field for backward compatibility.
+ */
+export function resolveToken(
+  config: Config,
+  tokenType: TokenType,
+  asBot = false
+): string {
+  // Explicit bot request
+  if (tokenType === 'bot' || (tokenType === 'auto' && asBot)) {
+    const token = config.botToken || config.token;
+    if (!token) {
+      throw new ConfigurationError(
+        'Bot token is not configured. Run: slack-cli config set --bot-token YOUR_TOKEN'
+      );
+    }
+    return token;
+  }
+
+  // Default: user token
+  const token = config.userToken || config.token;
+  if (!token) {
+    throw new ConfigurationError(
+      'User token is not configured. Run: slack-cli config set --user-token YOUR_TOKEN'
+    );
+  }
+  return token;
 }

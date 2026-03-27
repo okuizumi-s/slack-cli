@@ -7,6 +7,8 @@ import { ProfileConfigManager } from '../utils/profile-config';
 
 interface SetTokenOptions {
   token?: string;
+  userToken?: string;
+  botToken?: string;
   tokenStdin?: boolean;
   profile?: string;
 }
@@ -98,10 +100,28 @@ async function resolveTokenInput(options: SetTokenOptions): Promise<string> {
 
 export async function handleSetToken(options: SetTokenOptions): Promise<void> {
   const configManager = new ProfileConfigManager();
-  const token = await resolveTokenInput(options);
   const profileName = await getProfileName(configManager, options.profile);
-  await configManager.setToken(token, options.profile);
-  console.log(chalk.green(`✓ ${SUCCESS_MESSAGES.TOKEN_SAVED(profileName)}`));
+
+  let saved = false;
+
+  if (options.userToken) {
+    await configManager.setUserToken(options.userToken.trim(), options.profile);
+    console.log(chalk.green(`✓ User token saved for profile "${profileName}"`));
+    saved = true;
+  }
+
+  if (options.botToken) {
+    await configManager.setBotToken(options.botToken.trim(), options.profile);
+    console.log(chalk.green(`✓ Bot token saved for profile "${profileName}"`));
+    saved = true;
+  }
+
+  if (!saved) {
+    // Fallback to legacy token flow
+    const token = await resolveTokenInput(options);
+    await configManager.setToken(token, options.profile);
+    console.log(chalk.green(`✓ ${SUCCESS_MESSAGES.TOKEN_SAVED(profileName)}`));
+  }
 }
 
 export async function handleGetConfig(options: { profile?: string }): Promise<void> {
@@ -115,8 +135,18 @@ export async function handleGetConfig(options: { profile?: string }): Promise<vo
   }
 
   console.log(chalk.bold(`Configuration for profile "${profileName}":`));
-  console.log(`  Token: ${chalk.cyan(configManager.maskToken(currentConfig.token))}`);
-  console.log(`  Updated: ${chalk.gray(currentConfig.updatedAt)}`);
+  if (currentConfig.userToken) {
+    console.log(`  User Token:   ${chalk.cyan(configManager.maskToken(currentConfig.userToken))}`);
+  }
+  if (currentConfig.botToken) {
+    console.log(`  Bot Token:    ${chalk.cyan(configManager.maskToken(currentConfig.botToken))}`);
+  }
+  if (currentConfig.token && !currentConfig.userToken && !currentConfig.botToken) {
+    console.log(`  Token:        ${chalk.cyan(configManager.maskToken(currentConfig.token))}`);
+  } else if (currentConfig.token) {
+    console.log(`  Legacy Token: ${chalk.gray(configManager.maskToken(currentConfig.token))}`);
+  }
+  console.log(`  Updated:      ${chalk.gray(currentConfig.updatedAt)}`);
 }
 
 export async function handleListProfiles(): Promise<void> {

@@ -20,7 +20,9 @@ export class ProfileConfigManager {
   async setToken(token: string, profile?: string): Promise<void> {
     const store = await this.getConfigStore();
     const profileName = profile || store.defaultProfile || DEFAULT_PROFILE_NAME;
+    const existing = store.profiles[profileName];
     const config: Config = {
+      ...existing,
       token: this.cryptoService.encrypt(token),
       updatedAt: new Date().toISOString(),
     };
@@ -28,6 +30,44 @@ export class ProfileConfigManager {
     store.profiles[profileName] = config;
 
     // Set as default profile if it's the first one or explicitly setting default
+    if (!store.defaultProfile || profileName === DEFAULT_PROFILE_NAME) {
+      store.defaultProfile = profileName;
+    }
+
+    await this.saveConfigStore(store);
+  }
+
+  async setUserToken(token: string, profile?: string): Promise<void> {
+    const store = await this.getConfigStore();
+    const profileName = profile || store.defaultProfile || DEFAULT_PROFILE_NAME;
+    const existing = store.profiles[profileName] || { token: '', updatedAt: '' };
+    const config: Config = {
+      ...existing,
+      userToken: this.cryptoService.encrypt(token),
+      updatedAt: new Date().toISOString(),
+    };
+
+    store.profiles[profileName] = config;
+
+    if (!store.defaultProfile || profileName === DEFAULT_PROFILE_NAME) {
+      store.defaultProfile = profileName;
+    }
+
+    await this.saveConfigStore(store);
+  }
+
+  async setBotToken(token: string, profile?: string): Promise<void> {
+    const store = await this.getConfigStore();
+    const profileName = profile || store.defaultProfile || DEFAULT_PROFILE_NAME;
+    const existing = store.profiles[profileName] || { token: '', updatedAt: '' };
+    const config: Config = {
+      ...existing,
+      botToken: this.cryptoService.encrypt(token),
+      updatedAt: new Date().toISOString(),
+    };
+
+    store.profiles[profileName] = config;
+
     if (!store.defaultProfile || profileName === DEFAULT_PROFILE_NAME) {
       store.defaultProfile = profileName;
     }
@@ -44,20 +84,37 @@ export class ProfileConfigManager {
       return null;
     }
 
+    let needsSave = false;
     const decryptedToken = this.decryptToken(config.token);
 
     // Re-encrypt legacy or plaintext tokens and persist to disk.
-    if (!this.cryptoService.isCurrentFormat(config.token)) {
-      store.profiles[profileName] = {
-        ...config,
-        token: this.cryptoService.encrypt(decryptedToken),
-      };
+    if (config.token && !this.cryptoService.isCurrentFormat(config.token)) {
+      config.token = this.cryptoService.encrypt(decryptedToken);
+      needsSave = true;
+    }
+
+    const decryptedUserToken = config.userToken ? this.decryptToken(config.userToken) : undefined;
+    if (config.userToken && !this.cryptoService.isCurrentFormat(config.userToken)) {
+      config.userToken = this.cryptoService.encrypt(decryptedUserToken!);
+      needsSave = true;
+    }
+
+    const decryptedBotToken = config.botToken ? this.decryptToken(config.botToken) : undefined;
+    if (config.botToken && !this.cryptoService.isCurrentFormat(config.botToken)) {
+      config.botToken = this.cryptoService.encrypt(decryptedBotToken!);
+      needsSave = true;
+    }
+
+    if (needsSave) {
+      store.profiles[profileName] = config;
       await this.saveConfigStore(store);
     }
 
     return {
       ...config,
       token: decryptedToken,
+      userToken: decryptedUserToken,
+      botToken: decryptedBotToken,
     };
   }
 

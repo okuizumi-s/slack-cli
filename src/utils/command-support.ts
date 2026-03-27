@@ -1,3 +1,4 @@
+import type { TokenType } from '../types/config';
 import { createSlackClient } from './client-factory';
 import { parseFormat, parseProfile } from './option-parsers';
 import { SlackApiClient } from './slack-api-client';
@@ -5,6 +6,10 @@ import { sanitizeTerminalData } from './terminal-sanitizer';
 
 interface ProfileOption {
   profile?: string;
+}
+
+interface TokenOption {
+  asBot?: boolean;
 }
 
 interface FormatOption {
@@ -17,12 +22,18 @@ interface FormatRenderers<T> {
   json?: (data: T) => void;
 }
 
-export async function withSlackClient<TOptions extends ProfileOption, TResult>(
+/**
+ * Creates a SlackApiClient and runs the action.
+ * tokenType controls which token is used (default: 'auto' = user token, --as-bot for bot).
+ */
+export async function withSlackClient<TOptions extends ProfileOption & TokenOption, TResult>(
   options: TOptions,
-  action: (client: SlackApiClient) => Promise<TResult>
+  action: (client: SlackApiClient) => Promise<TResult>,
+  tokenType: TokenType = 'auto'
 ): Promise<TResult> {
   const profile = parseProfile(options.profile);
-  const client = await createSlackClient(profile);
+  const asBot = options.asBot ?? false;
+  const client = await createSlackClient(profile, tokenType, asBot);
 
   return await action(client);
 }

@@ -79,6 +79,40 @@ export class SearchOperations extends BaseSlackClient {
     };
   }
 
+  async searchFiles(query: string, options: SearchMessagesOptions = {}): Promise<{
+    files: Array<{ id: string; name: string; title: string; filetype: string; user: string; permalink: string }>;
+    totalCount: number;
+    page: number;
+    pageCount: number;
+  }> {
+    const { sort = 'score', sortDir = 'desc', count = 20, page = 1 } = options;
+    const response = await this.client.search.files({
+      query,
+      sort,
+      sort_dir: sortDir,
+      count,
+      page,
+    });
+
+    const files = ((response as { files?: { matches?: Array<Record<string, unknown>> } }).files?.matches || []).map((f) => ({
+      id: (f.id as string) || '',
+      name: (f.name as string) || '',
+      title: (f.title as string) || '',
+      filetype: (f.filetype as string) || '',
+      user: (f.user as string) || '',
+      permalink: (f.permalink as string) || '',
+    }));
+
+    const pagination = (response as { files?: { pagination?: { total_count?: number; page?: number; page_count?: number } } }).files?.pagination;
+
+    return {
+      files,
+      totalCount: pagination?.total_count || 0,
+      page: pagination?.page || 1,
+      pageCount: pagination?.page_count || 0,
+    };
+  }
+
   private async fetchSearchPage(query: string, page: number, count: number) {
     for (let attempt = 0; ; attempt++) {
       try {

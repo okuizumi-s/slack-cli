@@ -22,6 +22,7 @@ export function setupSendCommand(): Command {
     .option('-t, --thread <thread>', 'Thread timestamp to reply to')
     .option('--at <time>', 'Schedule time (Unix timestamp in seconds or ISO 8601)')
     .option('--after <minutes>', 'Schedule message after N minutes')
+    .option('--as-bot', 'Send as bot instead of user')
     .option('--profile <profile>', 'Use specific workspace profile')
     .hook(
       'preAction',
@@ -52,7 +53,8 @@ export function setupSendCommand(): Command {
 
         // Send message
         const profile = parseProfile(options.profile);
-        const client = await createSlackClient(profile);
+        const asBot = (options as Record<string, unknown>).asBot === true;
+        const client = await createSlackClient(profile, 'auto', asBot);
 
         // Resolve target channel
         let targetChannel: string;

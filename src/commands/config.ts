@@ -19,6 +19,8 @@ export function setupConfigCommand(): Command {
       '--token <token>',
       'Slack API token (deprecated: may leak via shell history/process list)'
     )
+    .option('--user-token <token>', 'Slack User OAuth token (xoxp-)')
+    .option('--bot-token <token>', 'Slack Bot OAuth token (xoxb-)')
     .option('--token-stdin', 'Read Slack API token from stdin')
     .option('--profile <profile>', 'Profile name (default: "default")')
     .action(wrapCommand(handleSetToken));
