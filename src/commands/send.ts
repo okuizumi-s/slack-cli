@@ -22,6 +22,7 @@ export function setupSendCommand(): Command {
     .option('-t, --thread <thread>', 'Thread timestamp to reply to')
     .option('--at <time>', 'Schedule time (Unix timestamp in seconds or ISO 8601)')
     .option('--after <minutes>', 'Schedule message after N minutes')
+    .option('--blocks <blocks>', 'JSON array of Block Kit blocks')
     .option('--as-bot', 'Send as bot instead of user')
     .option('--profile <profile>', 'Use specific workspace profile')
     .hook(
@@ -86,7 +87,8 @@ export function setupSendCommand(): Command {
           return;
         }
 
-        await client.sendMessage(targetChannel, messageContent, options.thread);
+        const blocks = options.blocks ? JSON.parse(options.blocks) : undefined;
+        await client.sendMessage(targetChannel, messageContent, options.thread, blocks);
         if (options.user || options.email) {
           console.log(chalk.green(`✓ DM sent to ${targetLabel}`));
         } else {

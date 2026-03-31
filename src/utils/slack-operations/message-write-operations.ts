@@ -23,16 +23,15 @@ export class MessageWriteOperations extends BaseSlackClient {
   async sendMessage(
     channel: string,
     text: string,
-    thread_ts?: string
+    thread_ts?: string,
+    blocks?: any[]
   ): Promise<ChatPostMessageResponse> {
     const params: ChatPostMessageArguments = {
       channel,
       text,
-    };
-
-    if (thread_ts) {
-      params.thread_ts = thread_ts;
-    }
+      ...(thread_ts && { thread_ts }),
+      ...(blocks && { blocks }),
+    } as ChatPostMessageArguments;
 
     return await this.client.chat.postMessage(params);
   }

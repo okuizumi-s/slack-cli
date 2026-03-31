@@ -95,9 +95,10 @@ export class SlackApiClient {
   async sendMessage(
     channel: string,
     text: string,
-    thread_ts?: string
+    thread_ts?: string,
+    blocks?: any[]
   ): Promise<ChatPostMessageResponse> {
-    return this.messageOps.sendMessage(channel, text, thread_ts);
+    return this.messageOps.sendMessage(channel, text, thread_ts, blocks);
   }
 
   async sendEphemeralMessage(

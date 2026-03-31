@@ -24,6 +24,7 @@ export interface SendOptions {
   thread?: string;
   at?: string;
   after?: string;
+  blocks?: string;
   profile?: string;
 }
 

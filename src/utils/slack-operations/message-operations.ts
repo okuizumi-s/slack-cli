@@ -42,9 +42,10 @@ export class MessageOperations extends BaseSlackClient {
   async sendMessage(
     channel: string,
     text: string,
-    thread_ts?: string
+    thread_ts?: string,
+    blocks?: any[]
   ): Promise<ChatPostMessageResponse> {
-    return await this.writeOps.sendMessage(channel, text, thread_ts);
+    return await this.writeOps.sendMessage(channel, text, thread_ts, blocks);
   }
 
   async sendEphemeralMessage(
