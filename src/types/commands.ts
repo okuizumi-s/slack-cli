@@ -69,14 +69,20 @@ export interface UnreadOptions {
 }
 
 export interface UploadOptions {
-  channel: string;
+  channel?: string;
+  user?: string;
+  email?: string;
   file?: string;
   content?: string;
   filename?: string;
   title?: string;
   message?: string;
+  blocks?: string;
   filetype?: string;
   thread?: string;
+  at?: string;
+  after?: string;
+  asBot?: boolean;
   profile?: string;
 }
 
@@ -84,6 +90,7 @@ export interface EditOptions {
   channel: string;
   ts: string;
   message: string;
+  blocks?: string;
   profile?: string;
 }
 

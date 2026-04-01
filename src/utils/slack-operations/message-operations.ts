@@ -70,8 +70,13 @@ export class MessageOperations extends BaseSlackClient {
     return await this.writeOps.listScheduledMessages(channel, limit);
   }
 
-  async updateMessage(channel: string, ts: string, text: string): Promise<ChatUpdateResponse> {
-    return await this.writeOps.updateMessage(channel, ts, text);
+  async updateMessage(
+    channel: string,
+    ts: string,
+    text: string,
+    blocks?: any[]
+  ): Promise<ChatUpdateResponse> {
+    return await this.writeOps.updateMessage(channel, ts, text, blocks);
   }
 
   async deleteMessage(channel: string, ts: string): Promise<void> {

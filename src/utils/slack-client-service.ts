@@ -119,8 +119,13 @@ export class SlackApiClient {
     return this.messageOps.scheduleMessage(channel, text, post_at, thread_ts);
   }
 
-  async updateMessage(channel: string, ts: string, text: string): Promise<ChatUpdateResponse> {
-    return this.messageOps.updateMessage(channel, ts, text);
+  async updateMessage(
+    channel: string,
+    ts: string,
+    text: string,
+    blocks?: any[]
+  ): Promise<ChatUpdateResponse> {
+    return this.messageOps.updateMessage(channel, ts, text, blocks);
   }
 
   async deleteMessage(channel: string, ts: string): Promise<void> {

@@ -84,13 +84,19 @@ export class MessageWriteOperations extends BaseSlackClient {
     return (response.scheduled_messages || []) as ScheduledMessage[];
   }
 
-  async updateMessage(channel: string, ts: string, text: string): Promise<ChatUpdateResponse> {
+  async updateMessage(
+    channel: string,
+    ts: string,
+    text: string,
+    blocks?: any[]
+  ): Promise<ChatUpdateResponse> {
     const channelId = await this.channelOps.resolveChannelId(channel);
 
     return await this.client.chat.update({
       channel: channelId,
       ts,
       text,
+      ...(blocks && { blocks }),
     });
   }
 

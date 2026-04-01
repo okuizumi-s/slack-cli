@@ -21,6 +21,7 @@ export function setupConfigCommand(): Command {
     )
     .option('--user-token <token>', 'Slack User OAuth token (xoxp-)')
     .option('--bot-token <token>', 'Slack Bot OAuth token (xoxb-)')
+    .option('--app-token <token>', 'Slack App-Level token for Socket Mode (xapp-)')
     .option('--token-stdin', 'Read Slack API token from stdin')
     .option('--profile <profile>', 'Profile name (default: "default")')
     .action(wrapCommand(handleSetToken));

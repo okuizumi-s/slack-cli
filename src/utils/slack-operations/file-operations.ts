@@ -23,6 +23,7 @@ export interface UploadFileOptions {
   filename?: string;
   title?: string;
   initialComment?: string;
+  blocks?: unknown[];
   snippetType?: string;
   threadTs?: string;
 }
@@ -107,6 +108,7 @@ export class FileOperations extends BaseSlackClient {
 
     if (options.title) params.title = options.title;
     if (options.initialComment) params.initial_comment = options.initialComment;
+    if (options.blocks) params.blocks = options.blocks;
     if (options.snippetType) params.snippet_type = options.snippetType;
     if (options.threadTs) params.thread_ts = options.threadTs;
 

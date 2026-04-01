@@ -2,6 +2,7 @@ export interface Config {
   token: string;
   userToken?: string;
   botToken?: string;
+  appToken?: string;
   updatedAt: string;
 }
 

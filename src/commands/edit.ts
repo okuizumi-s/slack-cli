@@ -12,6 +12,7 @@ export function setupEditCommand(): Command {
     .requiredOption('-c, --channel <channel>', 'Channel name or ID')
     .requiredOption('--ts <timestamp>', 'Message timestamp to edit')
     .requiredOption('-m, --message <message>', 'New message text')
+    .option('--blocks <blocks>', 'JSON array of Block Kit blocks')
     .option('--profile <profile>', 'Use specific workspace profile')
     .hook('preAction', createValidationHook([optionValidators.editTimestamp]))
     .action(
@@ -19,7 +20,8 @@ export function setupEditCommand(): Command {
         const profile = parseProfile(options.profile);
         const client = await createSlackClient(profile);
 
-        await client.updateMessage(options.channel, options.ts, options.message);
+        const blocks = options.blocks ? JSON.parse(options.blocks) : undefined;
+        await client.updateMessage(options.channel, options.ts, options.message, blocks);
         console.log(chalk.green(`✓ Message updated successfully in #${options.channel}`));
       })
     );

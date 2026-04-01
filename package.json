@@ -6,11 +6,14 @@
   "bin": {
     "slack-cli": "dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
+    "bot": "node dist/bot.js",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
@@ -22,13 +25,20 @@
     "check:fix": "biome check --write .",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["slack", "cli", "command-line", "messaging", "api"],
+  "keywords": [
+    "slack",
+    "cli",
+    "command-line",
+    "messaging",
+    "api"
+  ],
   "author": "urugus",
   "publishConfig": {
     "access": "public"
   },
   "license": "MIT",
   "dependencies": {
+    "@slack/bolt": "4.6.0",
     "@slack/web-api": "7.15.0",
     "chalk": "5.6.2",
     "commander": "14.0.3",

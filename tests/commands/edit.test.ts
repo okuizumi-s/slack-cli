@@ -63,7 +63,8 @@ describe('edit command', () => {
       expect(mockSlackClient.updateMessage).toHaveBeenCalledWith(
         'general',
         '1234567890.123456',
-        'Updated message'
+        'Updated message',
+        undefined
       );
       expect(mockConsole.logSpy).toHaveBeenCalledWith(
         expect.stringContaining('Message updated successfully in #general')

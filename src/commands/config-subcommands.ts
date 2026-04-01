@@ -9,6 +9,7 @@ interface SetTokenOptions {
   token?: string;
   userToken?: string;
   botToken?: string;
+  appToken?: string;
   tokenStdin?: boolean;
   profile?: string;
 }
@@ -116,6 +117,12 @@ export async function handleSetToken(options: SetTokenOptions): Promise<void> {
     saved = true;
   }
 
+  if (options.appToken) {
+    await configManager.setAppToken(options.appToken.trim(), options.profile);
+    console.log(chalk.green(`✓ App token saved for profile "${profileName}"`));
+    saved = true;
+  }
+
   if (!saved) {
     // Fallback to legacy token flow
     const token = await resolveTokenInput(options);
@@ -140,6 +147,9 @@ export async function handleGetConfig(options: { profile?: string }): Promise<vo
   }
   if (currentConfig.botToken) {
     console.log(`  Bot Token:    ${chalk.cyan(configManager.maskToken(currentConfig.botToken))}`);
+  }
+  if (currentConfig.appToken) {
+    console.log(`  App Token:    ${chalk.cyan(configManager.maskToken(currentConfig.appToken))}`);
   }
   if (currentConfig.token && !currentConfig.userToken && !currentConfig.botToken) {
     console.log(`  Token:        ${chalk.cyan(configManager.maskToken(currentConfig.token))}`);

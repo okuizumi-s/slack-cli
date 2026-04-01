@@ -75,6 +75,25 @@ export class ProfileConfigManager {
     await this.saveConfigStore(store);
   }
 
+  async setAppToken(token: string, profile?: string): Promise<void> {
+    const store = await this.getConfigStore();
+    const profileName = profile || store.defaultProfile || DEFAULT_PROFILE_NAME;
+    const existing = store.profiles[profileName] || { token: '', updatedAt: '' };
+    const config: Config = {
+      ...existing,
+      appToken: this.cryptoService.encrypt(token),
+      updatedAt: new Date().toISOString(),
+    };
+
+    store.profiles[profileName] = config;
+
+    if (!store.defaultProfile || profileName === DEFAULT_PROFILE_NAME) {
+      store.defaultProfile = profileName;
+    }
+
+    await this.saveConfigStore(store);
+  }
+
   async getConfig(profile?: string): Promise<Config | null> {
     const store = await this.getConfigStore();
     const profileName = profile || store.defaultProfile || DEFAULT_PROFILE_NAME;
@@ -105,6 +124,12 @@ export class ProfileConfigManager {
       needsSave = true;
     }
 
+    const decryptedAppToken = config.appToken ? this.decryptToken(config.appToken) : undefined;
+    if (config.appToken && !this.cryptoService.isCurrentFormat(config.appToken)) {
+      config.appToken = this.cryptoService.encrypt(decryptedAppToken!);
+      needsSave = true;
+    }
+
     if (needsSave) {
       store.profiles[profileName] = config;
       await this.saveConfigStore(store);
@@ -115,6 +140,7 @@ export class ProfileConfigManager {
       token: decryptedToken,
       userToken: decryptedUserToken,
       botToken: decryptedBotToken,
+      appToken: decryptedAppToken,
     };
   }
 
