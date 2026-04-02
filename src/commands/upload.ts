@@ -15,7 +15,7 @@ export function setupUploadCommand(): Command {
     .option('-c, --channel <channel>', 'Channel name or ID')
     .option('--user <username>', 'Upload to DM by username')
     .option('--email <email>', 'Upload to DM by email address')
-    .option('-f, --file <file>', 'File path to upload')
+    .option('-f, --file <file>', 'File path(s) to upload (repeatable)', (val: string, prev: string[] | undefined) => [...(prev || []), val])
     .option('--content <content>', 'Text content to upload as snippet')
     .option('--filename <filename>', 'Override filename')
     .option('--title <title>', 'File title')
@@ -43,12 +43,15 @@ export function setupUploadCommand(): Command {
           throw new FileError('Cannot use both --message and --blocks. When --blocks is specified, --message is ignored by the Slack API.');
         }
 
-        // Verify file exists if file path provided
+        // Verify file(s) exist if file path provided
         if (options.file) {
-          try {
-            await fs.access(options.file);
-          } catch {
-            throw new FileError(`File not found: ${options.file}`);
+          const files = Array.isArray(options.file) ? options.file : [options.file];
+          for (const f of files) {
+            try {
+              await fs.access(f);
+            } catch {
+              throw new FileError(`File not found: ${f}`);
+            }
           }
         }
 

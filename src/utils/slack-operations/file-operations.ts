@@ -18,7 +18,7 @@ export interface SlackFile {
 
 export interface UploadFileOptions {
   channel: string;
-  filePath?: string;
+  filePath?: string | string[];
   content?: string;
   filename?: string;
   title?: string;
@@ -99,8 +99,16 @@ export class FileOperations extends BaseSlackClient {
     };
 
     if (options.filePath) {
-      params.file = options.filePath;
-      params.filename = options.filename || basename(options.filePath);
+      const filePaths = Array.isArray(options.filePath) ? options.filePath : [options.filePath];
+      if (filePaths.length === 1) {
+        params.file = filePaths[0];
+        params.filename = options.filename || basename(filePaths[0]);
+      } else {
+        params.file_uploads = filePaths.map(fp => ({
+          file: fp,
+          filename: basename(fp),
+        }));
+      }
     } else if (options.content) {
       params.content = options.content;
       params.filename = options.filename;

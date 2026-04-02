@@ -220,10 +220,11 @@ export const optionValidators = {
    * Validates file or content options for upload command
    */
   fileOrContent: (options: Record<string, unknown>): string | null => {
-    if (!options.file && !options.content) {
+    const hasFile = Array.isArray(options.file) ? options.file.length > 0 : !!options.file;
+    if (!hasFile && !options.content) {
       return 'You must specify either --file or --content';
     }
-    if (options.file && options.content) {
+    if (hasFile && options.content) {
       return 'Cannot use both --file and --content';
     }
     return null;

@@ -72,7 +72,7 @@ export interface UploadOptions {
   channel?: string;
   user?: string;
   email?: string;
-  file?: string;
+  file?: string | string[];
   content?: string;
   filename?: string;
   title?: string;
